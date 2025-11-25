@@ -57,7 +57,6 @@ impl TwitterAuth {
             .authorize_url(CsrfToken::new_random)
             // Add standard Twitter scopes here
             .add_scope(Scope::new("users.read".to_string()))
-            .add_scope(Scope::new("offline.access".to_string()))
             .set_pkce_challenge(pkce_challenge)
             .url();
 
