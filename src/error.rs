@@ -1,4 +1,4 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 pub type SdkResult<T> = Result<T, SdkError>;
@@ -26,7 +26,7 @@ pub enum SdkError {
 
 /// Represents the standard error response body from Twitter API v2
 /// Reference: https://developer.twitter.com/en/support/twitter-api/error-troubleshooting
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct TwitterApiErrorData {
     pub title: String,
     #[serde(default)]
@@ -38,7 +38,7 @@ pub struct TwitterApiErrorData {
     pub errors: Option<Vec<ValidationError>>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct ValidationError {
     pub message: String,
     pub parameters: Option<serde_json::Value>,

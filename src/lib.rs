@@ -3,7 +3,7 @@ pub mod client;
 pub mod error;
 pub mod resources;
 
-mod config;
+pub mod config;
 
 // Re-export the Client for easy access
 pub use client::TwitterClient;

@@ -5,7 +5,7 @@ use crate::resources::user::UserHandler;
 use reqwest::{Client, Method};
 use serde::de::DeserializeOwned;
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct TwitterClient {
     http: Client,
     bearer_token: String,
@@ -13,14 +13,14 @@ pub struct TwitterClient {
 }
 
 impl TwitterClient {
-    pub fn new(bearer_token: String) -> SdkResult<Self> {
+    pub fn new(bearer_token: String) -> Self {
         let x_config = XConfig::load();
 
-        Ok(Self {
+        Self {
             http: Client::new(),
             bearer_token,
             base_url: x_config.api_base,
-        })
+        }
     }
 
     pub fn tweets(&'_ self) -> TweetHandler<'_> {

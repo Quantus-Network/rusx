@@ -18,6 +18,12 @@ pub struct TwitterToken {
     // You can add 'scope' or 'token_type' here if needed
 }
 
+#[derive(Deserialize)]
+pub struct TwitterCallbackParams {
+    pub code: String,
+}
+
+#[derive(Debug, Clone)]
 pub struct TwitterAuth {
     client: BasicClient,
 }
@@ -55,7 +61,8 @@ impl TwitterAuth {
         let (auth_url, _csrf_token) = self
             .client
             .authorize_url(CsrfToken::new_random)
-            // Add standard Twitter scopes here
+            // Add standard Twitter scopes here, both tweet.read and users.read is mandatory
+            .add_scope(Scope::new("tweet.read".to_string()))
             .add_scope(Scope::new("users.read".to_string()))
             .set_pkce_challenge(pkce_challenge)
             .url();
