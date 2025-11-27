@@ -1,12 +1,13 @@
 [package]
 name = "rusx"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Quantus Network Developers <hello@quantus.com>"]
 description = "A Rust SDK for the Twitter/X API v2"
 license = "Apache-2.0"
 edition = "2024"
 
 [dependencies]
+async-trait = "0.1"
 config = "0.14"
 reqwest = { version = "0.11", features = ["json"] }
 tokio = { version = "1.0", features = ["full"] }
@@ -15,3 +16,11 @@ serde_json = "1.0"
 thiserror = "1.0"
 oauth2 = "4.4"
 url = "2.4"
+
+[features]
+# Define a testing feature so mockall isn't included in your release builds
+testing = ["dep:mockall"]
+
+[dependencies.mockall]
+version = "0.12"
+optional = true
