@@ -26,7 +26,7 @@ Add `rusx` to your `Cargo.toml`:
 
 ``` toml
 [dependencies]
-rusx = { version = "0.1.0", path = "." }
+rusx = { git = "https://github.com/Quantus-Network/rusx", tag = "v0.1.0" }
 tokio = { version = "1.0", features = ["full"] }
 dotenv = "0.15"
 ```
@@ -99,10 +99,7 @@ println!("Tweet text: {}", tweet.data.text);
 
 ## 🛣️ Roadmap
 
--   [ ] Media Upload
--   [ ] Posting Tweets
--   [ ] Streams
--   [ ] Pagination helpers
+-   [ ] Search Tweets
 -   [ ] Rate-limit handling
 
 ## 🤝 Contributing
