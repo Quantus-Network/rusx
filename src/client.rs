@@ -23,12 +23,14 @@ impl TwitterClient {
         }
     }
 
-    pub fn tweets(&'_ self) -> TweetHandler<'_> {
-        TweetHandler::new(self)
+    // Updated: Returns owned handler (no lifetimes needed)
+    pub fn tweets(&self) -> TweetHandler {
+        TweetHandler::new(self.clone())
     }
 
-    pub fn users(&'_ self) -> UserHandler<'_> {
-        UserHandler::new(self)
+    // Updated: Returns owned handler
+    pub fn users(&self) -> UserHandler {
+        UserHandler::new(self.clone())
     }
 
     pub(crate) async fn request<T: DeserializeOwned>(
@@ -48,9 +50,7 @@ impl TwitterClient {
         let status = response.status();
 
         if !status.is_success() {
-            // Try to parse the error body provided by Twitter
             let error_body = response.json::<TwitterApiErrorData>().await.map_err(|_| {
-                // If we can't parse the JSON, return a generic error
                 SdkError::Unknown("Failed to parse error body from Twitter".to_string())
             })?;
 
