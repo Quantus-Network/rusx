@@ -36,6 +36,8 @@ pub struct TwitterApiErrorData {
     // Sometimes Twitter returns specific validation errors
     #[serde(default)]
     pub errors: Option<Vec<ValidationError>>,
+     #[serde(default)]
+    pub status: Option<u16>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
