@@ -3,6 +3,8 @@ use crate::auth::TwitterToken;
 use crate::client::TwitterClient;
 use crate::config::OauthConfig;
 use crate::error::SdkResult;
+use crate::resources::search::SearchApi;
+use crate::resources::search::SearchHandler;
 use crate::resources::tweet::{TweetApi, TweetHandler};
 use crate::resources::user::{UserApi, UserHandler};
 use async_trait::async_trait;
@@ -21,13 +23,9 @@ pub trait TwitterGateway: Debug + Send + Sync {
     ) -> SdkResult<TwitterToken>;
 
     fn generate_auth_url(&self) -> (String, PkceCodeVerifier);
-
-    /// Access to User Resources
     fn users(&self) -> Arc<dyn UserApi>;
-
-    /// Access to Tweet Resources
     fn tweets(&self) -> Arc<dyn TweetApi>;
-
+    fn search(&self) -> Arc<dyn SearchApi>;
     fn with_token(&self, token: String) -> SdkResult<Arc<dyn TwitterGateway>>;
 }
 
@@ -38,6 +36,7 @@ pub struct RusxGateway {
     // We cache the handlers wrapped in Arc<dyn Trait>
     user_api: Arc<dyn UserApi>,
     tweet_api: Arc<dyn TweetApi>,
+    search_api: Arc<dyn SearchApi>,
 }
 
 impl RusxGateway {
@@ -50,7 +49,8 @@ impl RusxGateway {
         Ok(Self {
             auth,
             user_api: Arc::new(UserHandler::new(client.clone())),
-            tweet_api: Arc::new(TweetHandler::new(client)),
+            tweet_api: Arc::new(TweetHandler::new(client.clone())),
+            search_api: Arc::new(SearchHandler::new(client)),
         })
     }
 }
@@ -77,13 +77,18 @@ impl TwitterGateway for RusxGateway {
         self.tweet_api.clone()
     }
 
+    fn search(&self) -> Arc<dyn SearchApi> {
+        self.search_api.clone()
+    }
+
     fn with_token(&self, token: String) -> SdkResult<Arc<dyn TwitterGateway>> {
         let client = TwitterClient::new(token);
 
         let new_gateway = RusxGateway {
             auth: self.auth.clone(),
             user_api: Arc::new(UserHandler::new(client.clone())),
-            tweet_api: Arc::new(TweetHandler::new(client)),
+            tweet_api: Arc::new(TweetHandler::new(client.clone())),
+            search_api: Arc::new(SearchHandler::new(client)),
         };
 
         Ok(Arc::new(new_gateway))
