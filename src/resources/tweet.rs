@@ -94,7 +94,7 @@ pub trait TweetApi: Debug + Send + Sync {
         &self,
         ids: Vec<String>,
         params: Option<TweetParams>,
-    ) -> SdkResult<TwitterApiResponse<Tweet>>;
+    ) -> SdkResult<TwitterApiResponse<Vec<Tweet>>>;
 }
 
 #[derive(Clone, Debug)]
@@ -126,7 +126,7 @@ impl TweetApi for TweetHandler {
         &self,
         ids: Vec<String>,
         params: Option<TweetParams>,
-    ) -> SdkResult<TwitterApiResponse<Tweet>> {
+    ) -> SdkResult<TwitterApiResponse<Vec<Tweet>>> {
         let mut effective_params = TweetParams::new();
 
         if let Some(params) = params {

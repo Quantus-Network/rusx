@@ -17,3 +17,5 @@ pub use gateway::MockTwitterGateway;
 pub use resources::tweet::MockTweetApi;
 #[cfg(feature = "testing")]
 pub use resources::user::MockUserApi;
+#[cfg(feature = "testing")]
+pub use resources::search::MockSearchApi;

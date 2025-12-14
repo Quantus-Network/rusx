@@ -1,6 +1,6 @@
 [package]
 name = "rusx"
-version = "0.3.0"
+version = "0.4.0"
 authors = ["Quantus Network Developers <hello@quantus.com>"]
 description = "A Rust SDK for the Twitter/X API v2"
 license = "Apache-2.0"
