@@ -60,6 +60,21 @@ pub struct SearchParams {
 }
 
 impl SearchParams {
+    fn flush_query_string_buffer(
+        queries: &mut Vec<String>,
+        current_batch: &Vec<String>,
+        keywords: Option<&str>,
+    ) {
+        if !current_batch.is_empty() {
+            let query_string = match keywords {
+                Some(k) => format!("({}) {}", current_batch.join(" OR "), k),
+                None => current_batch.join(" OR "),
+            };
+
+            queries.push(query_string);
+        }
+    }
+
     pub fn new(query: impl Into<String>) -> Self {
         Self {
             query: query.into(),
@@ -67,24 +82,47 @@ impl SearchParams {
         }
     }
 
-    pub fn build_whitelist_query(usernames: &Vec<String>, keywords: Option<&str>) -> Self {
-        // Create "from:user1 OR from:user2" string
-        let user_query = usernames
-            .iter()
-            .map(|u| format!("from:{}", u))
-            .collect::<Vec<_>>()
-            .join(" OR ");
+    pub fn build_batched_whitelist_queries(
+        usernames: &Vec<String>,
+        keywords: Option<&str>,
+    ) -> Vec<String> {
+        // Twitter's limit for the 'query' parameter
+        const TWEET_SEARCH_QUERY_MAX_CHARS: usize = 512;
 
-        // Combine with keywords if they exist
-        let final_query = match keywords {
-            Some(k) => format!("({}) {}", user_query, k),
-            None => user_query,
-        };
+        let mut queries = Vec::new();
 
-        Self {
-            query: final_query,
-            ..Default::default()
+        // The query wrapper structure: "(...users...) keyword"
+        // We calculate the static overhead first.
+        // Overhead = "(" + ") " + keyword
+        let wrapper_overhead = 1 + 2 + keywords.unwrap_or_default().len();
+
+        let mut current_batch: Vec<String> = Vec::new();
+        let mut current_len = wrapper_overhead;
+
+        for user in usernames {
+            let user_query = format!("from:{}", user);
+
+            // Calculate length cost of adding this user
+            // If it's not the first user in the batch, we need to add " OR " (4 chars)
+            let separator_len = if current_batch.is_empty() { 0 } else { 4 };
+            let added_len = separator_len + user_query.len();
+
+            if current_len + added_len > TWEET_SEARCH_QUERY_MAX_CHARS {
+                SearchParams::flush_query_string_buffer(&mut queries, &current_batch, keywords);
+
+                current_batch.clear();
+                current_batch.push(user_query.clone());
+                current_len = wrapper_overhead + user_query.len();
+            } else {
+                current_batch.push(user_query);
+                current_len += added_len;
+            }
         }
+
+        // Flush any remaining users in the buffer
+        SearchParams::flush_query_string_buffer(&mut queries, &current_batch, keywords);
+
+        queries
     }
 
     /// Helper to construct the query string manually since we are passing a string to the client wrapper

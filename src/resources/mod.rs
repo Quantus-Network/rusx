@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::resources::{search::SearchMeta, user::User};
+use crate::resources::{search::SearchMeta, tweet::Tweet, user::User};
 
 pub mod search;
 pub mod tweet;
@@ -225,6 +225,7 @@ impl AsQueryStr for TweetExpansion {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Includes {
     pub users: Option<Vec<User>>,
+    pub tweets: Option<Vec<Tweet>>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
