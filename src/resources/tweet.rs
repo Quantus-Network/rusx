@@ -16,7 +16,26 @@ pub struct Tweet {
     #[serde(default)]
     pub created_at: Option<String>,
     #[serde(default)]
+    pub in_reply_to_user_id: Option<String>,
+    #[serde(default)]
     pub public_metrics: Option<TweetPublicMetrics>,
+    #[serde(default)]
+    pub referenced_tweets: Option<Vec<ReferencedTweet>>,
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct ReferencedTweet {
+    #[serde(rename = "type")]
+    pub reference_type: ReferenceType,
+    pub id: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ReferenceType {
+    Retweeted,
+    Quoted,
+    RepliedTo,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, Default)]
