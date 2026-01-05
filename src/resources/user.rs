@@ -12,6 +12,7 @@ pub struct User {
     pub id: String,
     pub name: String,
     pub username: String,
+    pub description: Option<String>,
     pub public_metrics: Option<UserPublicMetrics>,
 }
 
